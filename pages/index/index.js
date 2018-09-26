@@ -45,13 +45,19 @@ Page({
     wx.getSetting({
         success: res => {
           let auth = res.authSetting['scope.userLocation']
+          //一次都没打开授权框的时候，这个值为undefiend
+          console.log(auth)
           this.setData({
             locationAuthType: auth? AUTHORIZED: (auth === false)? UNAUTHORIZED: UNPROMPTED
           })
-          this.getLocation()
+          if(auth){
+            this.getLocation()
+          }else{
+            this.getNow()
+          } 
         }
     })
-    this.getNow()
+    
   },
   getNow(callback){
       wx.request({
@@ -116,6 +122,7 @@ Page({
     })
   },
   onTapLocation(){
+    //处于未授权的状态直接就打开授权的界面
     if(this.data.locationAuthType == 1){
       wx.openSetting({
         success: res => {
@@ -123,7 +130,6 @@ Page({
             if(auth && this.data.locationAuthType !== 2){
               this.setData({
                 locationAuthType: AUTHORIZED
-    
               })
               this.getLocation()
             }
